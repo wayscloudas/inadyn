@@ -2,6 +2,7 @@
  *
  * Supported DDNS providers are:
  *   - DynDNS,
+ *   - Dynway,
  *   - DNS-O-Matic,
  *   - no-ip,
  *   - 3322,
@@ -77,6 +78,20 @@ static ddns_system_t dyndns = {
 	.checkip_ssl  = DYNDNS_MY_IP_SSL,
 
 	.server_name  = "members.dyndns.org",
+	.server_url   = "/nic/update"
+};
+
+static ddns_system_t dynway = {
+	.name         = "default@dynway.eu",
+
+	.request      = (req_fn_t)request,
+	.response     = (rsp_fn_t)response,
+
+	.checkip_name = DYNDNS_MY_IP_SERVER,
+	.checkip_url  = DYNDNS_MY_CHECKIP_URL,
+	.checkip_ssl  = DYNDNS_MY_IP_SSL,
+
+	.server_name  = "dynupdate.wayscloud.services",
 	.server_url   = "/nic/update"
 };
 
@@ -511,6 +526,8 @@ static int response(http_trans_t *trans, ddns_info_t *info, ddns_alias_t *alias)
 PLUGIN_INIT(plugin_init)
 {
 	plugin_register(&dyndns, DYNDNS_UPDATE_IP_HTTP_REQUEST);
+	plugin_register(&dynway, DYNDNS_UPDATE_IP_HTTP_REQUEST);
+	plugin_register_v6(&dynway, DYNDNS_UPDATE_IP_HTTP_REQUEST);
 	plugin_register(&dnsomatic, DYNDNS_UPDATE_IP_HTTP_REQUEST);
 	plugin_register_v6(&dnsomatic, DYNDNS_UPDATE_IP_HTTP_REQUEST);
 	plugin_register(&selfhost, DYNDNS_UPDATE_IP_HTTP_REQUEST);
@@ -561,6 +578,7 @@ PLUGIN_INIT(plugin_init)
 PLUGIN_EXIT(plugin_exit)
 {
 	plugin_unregister(&dyndns);
+	plugin_unregister(&dynway);
 	plugin_unregister(&dnsomatic);
 	plugin_unregister(&selfhost);
 	plugin_unregister(&no_ip);
